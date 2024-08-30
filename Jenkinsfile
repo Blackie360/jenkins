@@ -1,70 +1,101 @@
 pipeline {
     agent any
-
+    environment {
+        EMAIL_RECIPIENT = 'felixkent360@gmail.com'
+    }
     stages {
         stage('Build') {
             steps {
-                echo 'Building the application...'
-                // Example for Python project; adjust for other languages as needed
-                sh 'python setup.py install'
+                script {
+                    echo 'Building the application...'
+                    // Example build command for a Python project
+                    // You can use tools like setuptools or other build tools
+                    // For demonstration, we'll use a placeholder command
+                    sh 'echo Building the application...'
+                }
             }
         }
-        stage('Unit Tests') {
+        stage('Unit and Integration Tests') {
             steps {
-                echo 'Running unit tests...'
-                sh 'python -m unittest discover' // Adjust for your test framework
+                script {
+                    echo 'Running unit and integration tests...'
+                    // Running unit tests using pytest
+                    sh 'pytest'
+                }
             }
         }
         stage('Code Analysis') {
             steps {
-                echo 'Analyzing code...'
-                sh 'flake8 hello.py' // Adjust for your code analysis tool
+                script {
+                    echo 'Analyzing code with pylint...'
+                    // Performing code analysis with pylint
+                    sh 'pylint app.py test_app.py'
+                }
             }
         }
         stage('Security Scan') {
             steps {
-                echo 'Scanning for security issues...'
-                sh 'bandit -r .' // Adjust for your security scan tool
+                script {
+                    echo 'Performing security scan with bandit...'
+                    // Performing security scan with bandit
+                    sh 'bandit -r app.py'
+                }
             }
         }
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying to staging environment...'
-                // Example for a generic deployment; replace with your commands
-                sh 'scp -r * user@staging-server:/path/to/deploy'
+                script {
+                    echo 'Deploying to staging environment...'
+                    // Example deployment to staging server
+                    sh 'scp -r * user@staging-server:/path/to/staging'
+                }
             }
         }
         stage('Integration Tests on Staging') {
             steps {
-                echo 'Running integration tests on staging environment...'
-                // Example for running integration tests
-                sh 'pytest' // Adjust for your integration testing tool
+                script {
+                    echo 'Running integration tests on staging...'
+                    // Running integration tests in the staging environment
+                    sh 'pytest --staging'
+                }
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying to production environment...'
-                // Example for a generic deployment; replace with your commands
-                sh 'scp -r * user@production-server:/path/to/deploy'
+                script {
+                    echo 'Deploying to production environment...'
+                    // Example deployment to production server
+                    sh 'scp -r * user@production-server:/path/to/production'
+                }
             }
         }
     }
     post {
+        always {
+            mail to: "${EMAIL_RECIPIENT}",
+                 subject: "Jenkins Pipeline Status",
+                 body: """\
+The Jenkins pipeline has finished executing. 
+Here are the details:
+- Build Status: ${currentBuild.result}
+- Logs: See the attached logs.
+                 """,
+                 attachmentsPattern: '**/*.log'
+        }
         success {
-            emailext(
-                to: 'felixkent360@example.com',
-                subject: 'Pipeline Success',
-                body: 'The pipeline was successful!',
-                attachmentsPattern: '**/*.log'
-            )
+            echo 'Pipeline completed successfully.'
         }
         failure {
-            emailext(
-                to: 'felixkent360@example.com',
-                subject: 'Pipeline Failure',
-                body: 'The pipeline failed.',
-                attachmentsPattern: '**/*.log'
-            )
+            echo 'Pipeline failed.'
+            mail to: "${EMAIL_RECIPIENT}",
+                 subject: "Jenkins Pipeline Failed",
+                 body: """\
+The Jenkins pipeline has failed. 
+Here are the details:
+- Build Status: ${currentBuild.result}
+- Logs: See the attached logs.
+                 """,
+                 attachmentsPattern: '**/*.log'
         }
     }
 }
