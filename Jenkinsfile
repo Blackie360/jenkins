@@ -51,7 +51,7 @@ pipeline {
     post {
         success {
             emailext(
-                to: 'your-email@example.com',
+                to: 'felixkent360@example.com',
                 subject: 'Pipeline Success',
                 body: 'The pipeline was successful!',
                 attachmentsPattern: '**/*.log'
@@ -59,7 +59,7 @@ pipeline {
         }
         failure {
             emailext(
-                to: 'your-email@example.com',
+                to: 'felixkent360@example.com',
                 subject: 'Pipeline Failure',
                 body: 'The pipeline failed.',
                 attachmentsPattern: '**/*.log'

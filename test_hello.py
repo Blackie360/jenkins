@@ -1,18 +1,11 @@
-# test_hello.py
 import unittest
-from io import StringIO
-import sys
-from hello import main
+from hello import greet
 
-class TestHello(unittest.TestCase):
-    def test_main(self):
-        # Capture the output of the main function
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        main()
-        sys.stdout = sys.__stdout__
-        
-        self.assertEqual(captured_output.getvalue().strip(), "Hello, world!")
+class TestGreetFunction(unittest.TestCase):
+    def test_greet(self):
+        self.assertEqual(greet("jack"), "Hello, jack!")
+        self.assertEqual(greet("world"), "Hello, world!")
+        self.assertNotEqual(greet("jack"), "Hello, world!")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
