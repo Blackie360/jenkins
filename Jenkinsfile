@@ -9,8 +9,6 @@ pipeline {
                 script {
                     echo 'Building the application...'
                     // Example build command for a Python project
-                    // You can use tools like setuptools or other build tools
-                    // For demonstration, we'll use a placeholder command
                     sh 'echo Building the application...'
                 }
             }
@@ -72,30 +70,32 @@ pipeline {
     }
     post {
         always {
-            mail to: "${EMAIL_RECIPIENT}",
-                 subject: "Jenkins Pipeline Status",
-                 body: """\
+            emailext to: "${EMAIL_RECIPIENT}",
+                     subject: "Jenkins Pipeline Status",
+                     body: """\
 The Jenkins pipeline has finished executing. 
 Here are the details:
 - Build Status: ${currentBuild.result}
 - Logs: See the attached logs.
-                 """,
-                 attachmentsPattern: '**/*.log'
+                     """,
+                     attachmentsPattern: '**/*.log',
+                     compress: true
         }
         success {
             echo 'Pipeline completed successfully.'
         }
         failure {
             echo 'Pipeline failed.'
-            mail to: "${EMAIL_RECIPIENT}",
-                 subject: "Jenkins Pipeline Failed",
-                 body: """\
+            emailext to: "${EMAIL_RECIPIENT}",
+                     subject: "Jenkins Pipeline Failed",
+                     body: """\
 The Jenkins pipeline has failed. 
 Here are the details:
 - Build Status: ${currentBuild.result}
 - Logs: See the attached logs.
-                 """,
-                 attachmentsPattern: '**/*.log'
+                     """,
+                     attachmentsPattern: '**/*.log',
+                     compress: true
         }
     }
 }
